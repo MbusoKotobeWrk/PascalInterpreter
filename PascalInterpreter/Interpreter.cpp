@@ -25,20 +25,10 @@ void PascalInterpreter::Interpreter<T>::Advance()
 template<typename T>
 void PascalInterpreter::Interpreter<T>::SkipWhitespace()
 {
-	while (isspace(text.at(char_position)) && !text.empty())
+	while (!text.empty() && iswspace(text.at(char_position)))
 		Advance();
 }
 
-template<typename T>
-int PascalInterpreter::Interpreter<T>::Integer()
-{
-	std::wstring intToBuild("");
-	while (!text.empty() && isdigit(text.at(char_position)))
-	{
-		intToBuild.append(text.at(char_position));
-	}
-	return std::stoi(intToBuild);
-}
 
 template<typename T>
 void PascalInterpreter::Interpreter<T>::Eat(const std::wstring& tokenType)
@@ -84,7 +74,7 @@ T PascalInterpreter::Interpreter<T>::Expression()
 	currentToken = GetNextToken();
 
 	/**
-	* The assumption here is that 
+	* The assumption here is that
 	* the token is an integer.
 	*/
 	Token<T> left = currentToken;
@@ -123,8 +113,8 @@ T PascalInterpreter::Interpreter<T>::Expression()
 	* that our expression is in a good syntax
 	* that we expect it to be in;
 	* which is-> 1 + 1
-	* 
-	* If that is the case, we attempt to 
+	*
+	* If that is the case, we attempt to
 	* process the arithmetic exression.
 	*/
 	if (arithmeticOperator.GetValue == ADDITION_OPERATOR_SYMBOL)

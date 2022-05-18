@@ -38,6 +38,19 @@ namespace PascalInterpreter
 		size_t char_position;
 		Token<T> currentToken;
 	};
+
+	template<typename T>
+	int PascalInterpreter::Interpreter<T>::Integer()
+	{
+		std::wstring intToBuild(L"");
+		auto a = text.at(char_position);
+		while (!text.empty() && iswdigit(text.at(char_position)))
+		{
+			intToBuild += text.at(char_position);
+			//intToBuild.append(text.at(char_position));
+		}
+		return std::stoi(intToBuild);
+	}
 }
 
 
