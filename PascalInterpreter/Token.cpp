@@ -1,7 +1,7 @@
 #include "Token.h"
 
 template<typename T>
-const std::wstring& PascalInterpreter::Token<T>::GetType() const
+const std::string& PascalInterpreter::Token<T>::GetType() const
 {
 	return token_type;
 }
@@ -9,5 +9,5 @@ const std::wstring& PascalInterpreter::Token<T>::GetType() const
 template<typename T>
 T PascalInterpreter::Token<T>::GetValue()
 {
-	return value;
+	return token_value;
 }

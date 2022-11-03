@@ -1,4 +1,5 @@
 #include "Interpreter.h"
+#include "Token.h"
 
 template<typename T>
 void PascalInterpreter::Interpreter<T>::Error()
@@ -17,7 +18,7 @@ template<typename T>
 void PascalInterpreter::Interpreter<T>::Advance()
 {
 	char_position += 1;
-	if (char_position > sizeof(text))
+	if (char_position > text.length())
 		current_char = 0;
 	else current_char = text.at(char_position);
 }
@@ -25,13 +26,26 @@ void PascalInterpreter::Interpreter<T>::Advance()
 template<typename T>
 void PascalInterpreter::Interpreter<T>::SkipWhitespace()
 {
-	while (!text.empty() && iswspace(text.at(char_position)))
+	while (!text.empty() && isspace(text.at(char_position)))
 		Advance();
 }
 
+template<typename T>
+int PascalInterpreter::Interpreter<T>::Integer()
+{
+	std::string intToBuild("");
+	auto a = text.at(char_position);
+	while (!text.empty() && isdigit(text.at(char_position)))
+	{
+		intToBuild += text.at(char_position);
+		Advance();
+		//intToBuild.append(text.at(char_position));
+	}
+	return std::stoi(intToBuild);
+}
 
 template<typename T>
-void PascalInterpreter::Interpreter<T>::Eat(const std::wstring& tokenType)
+void PascalInterpreter::Interpreter<T>::Eat(const std::string& tokenType)
 {
 	if (currentToken.type.compare(tokenType))
 		currentToken = GetNextToken();
@@ -40,35 +54,7 @@ void PascalInterpreter::Interpreter<T>::Eat(const std::wstring& tokenType)
 
 
 template<typename T>
-T& PascalInterpreter::Interpreter<T>::GetNextToken() const
-{
-	while (!iswblank(current_char))
-	{
-		if (iswspace(current_char))
-			SkipWhitespace();
-
-		if (iswdigit(current_char))
-			return Token<int>(INTEGER_TYPE, Integer());
-
-		if (current_char == ADDITION_OPERATOR_SYMBOL)
-			return Token<wchar_t>(ADDTION_OPERATOR, current_char);
-
-		if (current_char == SUBTRACTION_OPERATOR_SYMBOL)
-			return Token<wchar_t>(SUBSTRACTION_OEPRATOR, current_char);
-
-		if (current_char == MULTIPLICATION_OPERATOR_SYMBOL)
-			return Token<wchar_t>(MULITPLICATION_OPERATOR, current_char);
-
-		if (current_char == DIVISION_OPERATOR_SYMBOL)
-			return Token<wchar_t>(DIVISION_OPERATOR, current_char);
-
-		if (current_char == MODULUS_OPERATOR_SYMBOL)
-			return Token<wchar_t>(MODULUS_OPERATOR, current_char);
-	}
-}
-
-template<typename T>
-T PascalInterpreter::Interpreter<T>::Expression()
+int PascalInterpreter::Interpreter<T>::Expression()
 {
 	int result = 0;
 	currentToken = GetNextToken();
@@ -77,7 +63,7 @@ T PascalInterpreter::Interpreter<T>::Expression()
 	* The assumption here is that
 	* the token is an integer.
 	*/
-	Token<T> left = currentToken;
+	auto left = currentToken;
 	Eat(INTEGER_TYPE);
 
 	/**
@@ -85,7 +71,7 @@ T PascalInterpreter::Interpreter<T>::Expression()
 	* the token is an arithmetic
 	* operator e.g +, -, *, /
 	*/
-	Token<T> arithmeticOperator = currentToken;
+	auto arithmeticOperator = currentToken;
 	if (arithmeticOperator.GetType().compare(ADDTION_OPERATOR))
 		Eat(ADDTION_OPERATOR);
 
@@ -105,7 +91,7 @@ T PascalInterpreter::Interpreter<T>::Expression()
 	* The assumption here is that
 	* the token is an integer.
 	*/
-	Token<T> right = currentToken;
+	auto right = currentToken;
 	Eat(INTEGER_TYPE);
 
 	/**
@@ -132,3 +118,4 @@ T PascalInterpreter::Interpreter<T>::Expression()
 	if (arithmeticOperator.GetValue() == MODULUS_OPERATOR_SYMBOL)
 		return left.GetValue() % right.GetValue();
 }
+
