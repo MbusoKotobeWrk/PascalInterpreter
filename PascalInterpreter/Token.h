@@ -2,47 +2,46 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <iostream>
 #include <string>
 
-
-namespace PascalInterpreter 
+namespace PascalInterpreter
 {
-	template<class T>
-	class Token
-	{
+    template<class T>
+    class Token
+    {
+        template<typename T>
+        friend std::ostream& operator<<(std::ostream& output, const Token<T>& token);
 
-	public:
-		Token<T>() = default;
-		Token<T>(const Token<T>& obj) :
-			token_type(obj.token_type), token_value(obj.token_value)
-		{	}
+        public:
+        Token<T>(std::string type, T value) : token_type(type), token_value(value)
+        {}
+        Token<T>(T value) : token_value(value), token_type("")
+        {}
+        Token<T>() = default;
 
-		Token<T>& operator= (const Token<T>& rhs)
-		{
-			token_type = rhs.token_type;
-			token_value = rhs.token_value;
-			return *this;
-		}
+        public:
+        Token<T>& operator=(const Token<T>& rhs)
+        {
+            token_value = rhs.token_value;
+            token_type = rhs.token_type;
+            return *this;
+        }
 
-		Token<T>& operator= (const Token<T>* rhs)
-		{
-			token_type = rhs->token_type;
-			token_value = rhs->token_value;
-			return *this;
-		}
+        public:
+        const T GetTokenValue() const { return token_value; }
+        const std::string& GetTokenType() const { return token_type; }
 
-		Token(const std::string& tokenType, T val) : token_type(tokenType), token_value(val)
-		{	}
+        private:
+        T token_value = 0;
+        std::string token_type;
+    };
 
-	public:
-		const std::string& GetType() const;
-		T GetValue();
-
-	private:
-		const std::string token_type;
-		T token_value;
-	};
-
+    template<typename T>
+    std::ostream& operator<<(std::ostream& output, const Token<T>& token)
+    {
+        output << token.token_value << token.token_type;
+        return output;
+    }
 }
-
-#endif
+#endif // !TOKEN_H

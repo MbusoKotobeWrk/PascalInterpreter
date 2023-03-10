@@ -13,7 +13,7 @@ namespace PascalInterpreterTest
 		
 			TEST_METHOD(TestMethod1)
 			{
-				Interpreter<std::string> interpret = Interpreter<std::string>("55 + 5");
+				Interpreter interpret = Interpreter("55 + 5");
 				Assert::AreEqual(interpret.Expression(), 60);
 			}
 	};

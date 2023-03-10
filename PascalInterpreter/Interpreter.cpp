@@ -1,121 +1,192 @@
 #include "Interpreter.h"
-#include "Token.h"
+#include "TokenType.h"
+#include "OperatorTokenSymbol.h"
 
-template<typename T>
-void PascalInterpreter::Interpreter<T>::Error()
+namespace PascalInterpreter
 {
-	try
+	void Interpreter::Error()
 	{
-		throw std::logic_error::logic_error("Error parsing input!");
+		try
+		{
+			throw std::logic_error::logic_error("Error parsing input!");
+		}
+		catch (const std::exception& exceptionObject)
+		{
+			std::cerr << exceptionObject.what();
+		}
 	}
-	catch (const std::exception& exceptionObject)
+
+	void Interpreter::Advance()
 	{
-		std::cerr << exceptionObject.what();
+		char_position += 1;
+		if (char_position >= text.length())
+			current_char = 0;
+		else current_char = text.at(char_position);
 	}
-}
 
-template<typename T>
-void PascalInterpreter::Interpreter<T>::Advance()
-{
-	char_position += 1;
-	if (char_position > text.length())
-		current_char = 0;
-	else current_char = text.at(char_position);
-}
-
-template<typename T>
-void PascalInterpreter::Interpreter<T>::SkipWhitespace()
-{
-	while (!text.empty() && isspace(text.at(char_position)))
-		Advance();
-}
-
-template<typename T>
-int PascalInterpreter::Interpreter<T>::Integer()
-{
-	std::string intToBuild("");
-	auto a = text.at(char_position);
-	while (!text.empty() && isdigit(text.at(char_position)))
+	void Interpreter::SkipWhitespace()
 	{
-		intToBuild += text.at(char_position);
-		Advance();
-		//intToBuild.append(text.at(char_position));
+		while (!text.empty() && isspace(text.at(char_position)))
+			Advance();
 	}
-	return std::stoi(intToBuild);
+
+	int Interpreter::Integer()
+	{
+		std::string intToBuild("");
+		auto character = text.at(char_position);
+		while (!text.empty() && isdigit(current_char))
+		{
+			intToBuild += text.at(char_position);
+			Advance();
+			//character = text.at(char_position);
+		}
+		return std::stoi(intToBuild);
+	}
+
+	void Interpreter::Eat(const std::string& tokenType)
+	{
+		if (current_token->GetTokenType()._Equal(tokenType))
+			current_token = GetNextToken();
+		else Error();
+	}
+
+	std::shared_ptr<Token<std::string>> Interpreter::GetNextToken()
+	{
+		while (current_char != '\0')
+		{
+			if (isspace(current_char))
+			{
+				SkipWhitespace();
+			}
+			else if (isdigit(current_char))
+			{
+				std::shared_ptr token = std::make_shared<Token<std::string>>
+					(INTEGER_TYPE, std::to_string(Integer()));
+				Advance();
+				return token;
+			}
+			else if (current_char == ADDITION_OPERATOR_SYMBOL)
+			{
+				std::shared_ptr token = std::make_shared<Token<std::string>>
+					(ADDTION_OPERATOR, std::string(1, current_char));
+				Advance();
+				return token;
+			}
+			else if (current_char == SUBTRACTION_OPERATOR_SYMBOL)
+			{
+				std::shared_ptr token = std::make_shared<Token<std::string>>
+					(SUBSTRACTION_OEPRATOR, std::string(1, current_char));
+				Advance();
+				return token;
+			}
+			else if (current_char == MULTIPLICATION_OPERATOR_SYMBOL)
+			{
+				std::shared_ptr token = std::make_shared<Token<std::string>>
+					(MULITPLICATION_OPERATOR, std::string(1, current_char));
+				Advance();
+				return token;
+			}
+			else if (current_char == DIVISION_OPERATOR_SYMBOL)
+			{
+				std::shared_ptr token = std::make_shared<Token<std::string>>
+					(DIVISION_OPERATOR, std::string(1, current_char));
+				Advance();
+				return token;
+			}
+			else if (current_char == MODULUS_OPERATOR_SYMBOL)
+			{
+				std::shared_ptr token = std::make_shared<Token<std::string>>
+					(MODULUS_OPERATOR, std::string(1, current_char));
+				Advance();
+				return token;
+			}
+			else
+			{
+				Error();
+			}
+		}
+		return nullptr;
+	}
+
+	int Interpreter::Expression()
+	{
+		current_token = GetNextToken();
+
+		/**
+		* The assumption here is that
+		* the token is an integer.
+		*/
+		auto left = current_token;
+		Eat(INTEGER_TYPE);
+
+		/**
+		* The assumption here is that
+		* the token is an arithmetic
+		* operator e.g +, -, *, /
+		*/
+		auto arithmeticOperator = current_token;
+		if (arithmeticOperator->GetTokenType()._Equal(ADDTION_OPERATOR))
+			Eat(ADDTION_OPERATOR);
+
+		if (arithmeticOperator->GetTokenType()._Equal(SUBSTRACTION_OEPRATOR))
+			Eat(SUBSTRACTION_OEPRATOR);
+
+		if (arithmeticOperator->GetTokenType()._Equal(MULITPLICATION_OPERATOR))
+			Eat(MULITPLICATION_OPERATOR);
+
+		if (arithmeticOperator->GetTokenType()._Equal(DIVISION_OPERATOR))
+			Eat(DIVISION_OPERATOR);
+
+		if (arithmeticOperator->GetTokenType()._Equal(MODULUS_OPERATOR))
+			Eat(MODULUS_OPERATOR);
+
+		/**
+		* The assumption here is that
+		* the token is an integer.
+		*/
+		auto right = current_token;
+		Eat(INTEGER_TYPE);
+
+		/**
+		* At this point it is safe to assume
+		* that our expression is in a good syntactic
+		* structure that we expect it to be in;
+		* which is-> 1 + 1
+		*
+		* If that is the case, we attempt to
+		* process the arithmetic exression.
+		*/
+		//TODO: Overload oeprators for TokenTypes.
+		auto operatorS = arithmeticOperator->GetTokenValue().at(TOKEN_VALUE_POS);
+		switch (arithmeticOperator->GetTokenValue().at(TOKEN_VALUE_POS))
+		{
+		case ADDITION_OPERATOR_SYMBOL:
+			return std::stoi(left->GetTokenValue()) + std::stoi(right->GetTokenValue());
+
+		case SUBTRACTION_OPERATOR_SYMBOL:
+			return  std::stoi(left->GetTokenValue()) - std::stoi(right->GetTokenValue());
+
+		case MULTIPLICATION_OPERATOR_SYMBOL:
+			return  std::stoi(left->GetTokenValue()) * std::stoi(right->GetTokenValue());
+
+		case DIVISION_OPERATOR_SYMBOL:
+			return std::stoi(left->GetTokenValue()) / std::stoi(right->GetTokenValue());
+
+		case MODULUS_OPERATOR_SYMBOL:
+			return std::stoi(left->GetTokenValue()) % std::stoi(right->GetTokenValue());
+
+		default: return -1;
+			break;
+		}
+		return -1;
+	}
+
+	std::ostream& operator<< (std::ostream& out, const Interpreter& txt)
+	{
+		out << "Text Var" << txt.text << " " << '\n'
+			<< "CurrentChar Var" << txt.current_char << " " << '\n'
+			<< "CharPosition Var" << txt.char_position << " " << '\n';
+		//<< "CurrentToken Obj" << *txt.current_token;
+		return out;
+	}
 }
-
-template<typename T>
-void PascalInterpreter::Interpreter<T>::Eat(const std::string& tokenType)
-{
-	if (currentToken.type.compare(tokenType))
-		currentToken = GetNextToken();
-	else Error();
-}
-
-
-template<typename T>
-int PascalInterpreter::Interpreter<T>::Expression()
-{
-	int result = 0;
-	currentToken = GetNextToken();
-
-	/**
-	* The assumption here is that
-	* the token is an integer.
-	*/
-	auto left = currentToken;
-	Eat(INTEGER_TYPE);
-
-	/**
-	* The assumption here is that
-	* the token is an arithmetic
-	* operator e.g +, -, *, /
-	*/
-	auto arithmeticOperator = currentToken;
-	if (arithmeticOperator.GetType().compare(ADDTION_OPERATOR))
-		Eat(ADDTION_OPERATOR);
-
-	if (arithmeticOperator.GetType().compare(SUBSTRACTION_OEPRATOR))
-		Eat(SUBSTRACTION_OEPRATOR);
-
-	if (arithmeticOperator.GetType().compare(MULITPLICATION_OPERATOR))
-		Eat(MULITPLICATION_OPERATOR);
-
-	if (arithmeticOperator.GetType().compare(DIVISION_OPERATOR))
-		Eat(DIVISION_OPERATOR);
-
-	if (arithmeticOperator.GetType().compare(MODULUS_OPERATOR))
-		Eat(MODULUS_OPERATOR);
-
-	/**
-	* The assumption here is that
-	* the token is an integer.
-	*/
-	auto right = currentToken;
-	Eat(INTEGER_TYPE);
-
-	/**
-	* At this point it is safe to assume
-	* that our expression is in a good syntax
-	* that we expect it to be in;
-	* which is-> 1 + 1
-	*
-	* If that is the case, we attempt to
-	* process the arithmetic exression.
-	*/
-	if (arithmeticOperator.GetValue == ADDITION_OPERATOR_SYMBOL)
-		return left.GetValue() + right.GetValue();
-
-	if (arithmeticOperator.GetValue() == SUBTRACTION_OPERATOR_SYMBOL)
-		return left.GetValue() - right.GetValue();
-
-	if (arithmeticOperator.GetValue() == MULTIPLICATION_OPERATOR_SYMBOL)
-		return left.GetValue() * right.GetValue();
-
-	if (arithmeticOperator.GetValue() == DIVISION_OPERATOR_SYMBOL)
-		return left.GetValue() / right.GetValue();
-
-	if (arithmeticOperator.GetValue() == MODULUS_OPERATOR_SYMBOL)
-		return left.GetValue() % right.GetValue();
-}
-
