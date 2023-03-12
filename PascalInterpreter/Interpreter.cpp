@@ -36,7 +36,6 @@ namespace PascalInterpreter
 		{
 			intToBuild += text.at(char_position);
 			Advance();
-			//character = text.at(char_position);
 		}
 		return std::stoi(intToBuild);
 	}
@@ -110,77 +109,6 @@ namespace PascalInterpreter
 
 	int Interpreter::Expression()
 	{
-		/*current_token = GetNextToken();
-
-		*
-		* The assumption here is that
-		* the token is an integer.
-		*
-		auto left = current_token;
-		Eat(INTEGER_TYPE);
-
-		/**
-		* The assumption here is that
-		* the token is an arithmetic
-		* operator e.g +, -, *, /
-		*
-		auto arithmeticOperator = current_token;
-		if (arithmeticOperator->GetTokenType()._Equal(ADDTION_OPERATOR))
-			Eat(ADDTION_OPERATOR);
-
-		if (arithmeticOperator->GetTokenType()._Equal(SUBSTRACTION_OEPRATOR))
-			Eat(SUBSTRACTION_OEPRATOR);
-
-		if (arithmeticOperator->GetTokenType()._Equal(MULITPLICATION_OPERATOR))
-			Eat(MULITPLICATION_OPERATOR);
-
-		if (arithmeticOperator->GetTokenType()._Equal(DIVISION_OPERATOR))
-			Eat(DIVISION_OPERATOR);
-
-		if (arithmeticOperator->GetTokenType()._Equal(MODULUS_OPERATOR))
-			Eat(MODULUS_OPERATOR);
-
-		/**
-		* The assumption here is that
-		* the token is an integer.
-		*
-		auto right = current_token;
-		Eat(INTEGER_TYPE);
-
-		/**
-		* At this point it is safe to assume
-		* that our expression is in a good syntactic
-		* structure that we expect it to be in;
-		* which is-> 1 + 1
-		*
-		* If that is the case, we attempt to
-		* process the arithmetic exression.
-		*
-		//TODO: Overload oeprators for TokenTypes.
-		auto operatorS = arithmeticOperator->GetTokenValue().at(TOKEN_VALUE_POS);
-		switch (arithmeticOperator->GetTokenValue().at(TOKEN_VALUE_POS))
-		{
-		case ADDITION_OPERATOR_SYMBOL:
-			return std::stoi(left->GetTokenValue()) + std::stoi(right->GetTokenValue());
-
-		case SUBTRACTION_OPERATOR_SYMBOL:
-			return  std::stoi(left->GetTokenValue()) - std::stoi(right->GetTokenValue());
-
-		case MULTIPLICATION_OPERATOR_SYMBOL:
-			return  std::stoi(left->GetTokenValue()) * std::stoi(right->GetTokenValue());
-
-		case DIVISION_OPERATOR_SYMBOL:
-			return std::stoi(left->GetTokenValue()) / std::stoi(right->GetTokenValue());
-
-		case MODULUS_OPERATOR_SYMBOL:
-			return std::stoi(left->GetTokenValue()) % std::stoi(right->GetTokenValue());
-
-		default: return -1;
-			break;
-		}*/
-		
-
-		/*New Expression Processing Code*/
 		current_token = GetNextToken();
 		int result = Term();
 		while (
