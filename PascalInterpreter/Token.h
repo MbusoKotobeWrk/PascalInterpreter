@@ -34,7 +34,7 @@ namespace PascalInterpreter
 
         private:
         T token_value = 0;
-        std::string token_type;
+        std::string token_type = std::string("");
     };
 
     template<typename T>
