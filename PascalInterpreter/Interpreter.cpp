@@ -1,6 +1,4 @@
 #include "Interpreter.h"
-#include "TokenType.h"
-#include "OperatorTokenSymbol.h"
 
 namespace PascalInterpreter
 {
@@ -43,13 +41,6 @@ namespace PascalInterpreter
 		return std::stoi(intToBuild);
 	}
 
-	void Interpreter::Eat(const std::string& tokenType)
-	{
-		if (current_token->GetTokenType()._Equal(tokenType))
-			current_token = GetNextToken();
-		else Error();
-	}
-
 	std::shared_ptr<Token<std::string>> Interpreter::GetNextToken()
 	{
 		while (current_char != '\0')
@@ -60,43 +51,43 @@ namespace PascalInterpreter
 			}
 			else if (isdigit(current_char))
 			{
-				std::shared_ptr token = std::make_shared<Token<std::string>>
-					(INTEGER_TYPE, std::to_string(Integer()));
+				std::shared_ptr<Token<std::string>> token = 
+				std::make_shared<Token<std::string>> (INTEGER_TYPE, std::to_string(Integer()));
 				Advance();
 				return token;
 			}
 			else if (current_char == ADDITION_OPERATOR_SYMBOL)
 			{
-				std::shared_ptr token = std::make_shared<Token<std::string>>
-					(ADDTION_OPERATOR, std::string(1, current_char));
+				std::shared_ptr<Token<std::string>> token = 
+				std::make_shared<Token<std::string>> (ADDTION_OPERATOR, std::string(1, current_char));
 				Advance();
 				return token;
 			}
 			else if (current_char == SUBTRACTION_OPERATOR_SYMBOL)
 			{
-				std::shared_ptr token = std::make_shared<Token<std::string>>
-					(SUBSTRACTION_OEPRATOR, std::string(1, current_char));
+				std::shared_ptr<Token<std::string>> token = 
+				std::make_shared<Token<std::string>> (SUBSTRACTION_OEPRATOR, std::string(1, current_char));
 				Advance();
 				return token;
 			}
 			else if (current_char == MULTIPLICATION_OPERATOR_SYMBOL)
 			{
-				std::shared_ptr token = std::make_shared<Token<std::string>>
-					(MULITPLICATION_OPERATOR, std::string(1, current_char));
+				std::shared_ptr<Token<std::string>> token = 
+				std::make_shared<Token<std::string>> (MULITPLICATION_OPERATOR, std::string(1, current_char));
 				Advance();
 				return token;
 			}
 			else if (current_char == DIVISION_OPERATOR_SYMBOL)
 			{
-				std::shared_ptr token = std::make_shared<Token<std::string>>
-					(DIVISION_OPERATOR, std::string(1, current_char));
+				std::shared_ptr<Token<std::string>> token = 
+				std::make_shared<Token<std::string>> (DIVISION_OPERATOR, std::string(1, current_char));
 				Advance();
 				return token;
 			}
 			else if (current_char == MODULUS_OPERATOR_SYMBOL)
 			{
-				std::shared_ptr token = std::make_shared<Token<std::string>>
-					(MODULUS_OPERATOR, std::string(1, current_char));
+				std::shared_ptr<Token<std::string>> token = 
+				std::make_shared<Token<std::string>> (MODULUS_OPERATOR, std::string(1, current_char));
 				Advance();
 				return token;
 			}
@@ -108,14 +99,23 @@ namespace PascalInterpreter
 		return nullptr;
 	}
 
+	/*PARSER CODE*/
+
+	void Interpreter::Eat(const std::string& tokenType)
+	{
+		if (current_token->GetTokenType()._Equal(tokenType))
+			current_token = GetNextToken();
+		else Error();
+	}
+
 	int Interpreter::Expression()
 	{
-		current_token = GetNextToken();
+		/*current_token = GetNextToken();
 
-		/**
+		*
 		* The assumption here is that
 		* the token is an integer.
-		*/
+		*
 		auto left = current_token;
 		Eat(INTEGER_TYPE);
 
@@ -123,7 +123,7 @@ namespace PascalInterpreter
 		* The assumption here is that
 		* the token is an arithmetic
 		* operator e.g +, -, *, /
-		*/
+		*
 		auto arithmeticOperator = current_token;
 		if (arithmeticOperator->GetTokenType()._Equal(ADDTION_OPERATOR))
 			Eat(ADDTION_OPERATOR);
@@ -143,7 +143,7 @@ namespace PascalInterpreter
 		/**
 		* The assumption here is that
 		* the token is an integer.
-		*/
+		*
 		auto right = current_token;
 		Eat(INTEGER_TYPE);
 
@@ -155,7 +155,7 @@ namespace PascalInterpreter
 		*
 		* If that is the case, we attempt to
 		* process the arithmetic exression.
-		*/
+		*
 		//TODO: Overload oeprators for TokenTypes.
 		auto operatorS = arithmeticOperator->GetTokenValue().at(TOKEN_VALUE_POS);
 		switch (arithmeticOperator->GetTokenValue().at(TOKEN_VALUE_POS))
@@ -177,8 +177,72 @@ namespace PascalInterpreter
 
 		default: return -1;
 			break;
+		}*/
+		
+
+		/*New Expression Processing Code*/
+		current_token = GetNextToken();
+		int result = Term();
+		while (
+			!current_token->GetTokenType()._Equal(OOET) &&
+			current_token->GetTokenType()._Equal(ADDTION_OPERATOR) ||
+			current_token->GetTokenType()._Equal(SUBSTRACTION_OEPRATOR) ||
+			current_token->GetTokenType()._Equal(MULITPLICATION_OPERATOR) ||
+			current_token->GetTokenType()._Equal(DIVISION_OPERATOR) ||
+			current_token->GetTokenType()._Equal(MODULUS_OPERATOR))
+		{
+			std::shared_ptr<Token<std::string>> token = current_token;
+			if (token->GetTokenType()._Equal(ADDTION_OPERATOR))
+			{
+				Eat(ADDTION_OPERATOR);
+				result += Term();
+				HandleSharedPtrSafety();
+			}
+			else if (token->GetTokenType()._Equal(SUBSTRACTION_OEPRATOR))
+			{
+				Eat(SUBSTRACTION_OEPRATOR);
+				result -= Term();
+				HandleSharedPtrSafety();
+			}
+			else if (token->GetTokenType()._Equal(MULITPLICATION_OPERATOR))
+			{
+				Eat(MULITPLICATION_OPERATOR);
+				result *= Term();
+				HandleSharedPtrSafety();
+			}
+			else if (token->GetTokenType()._Equal(DIVISION_OPERATOR))
+			{
+				Eat(DIVISION_OPERATOR);
+				result /= Term();
+				HandleSharedPtrSafety();
+			}
+			else if (token->GetTokenType()._Equal(MODULUS_OPERATOR))
+			{
+				Eat(MODULUS_OPERATOR);
+				result %= Term();
+				HandleSharedPtrSafety();
+			}
+			else
+			{
+				Error();
+			}
 		}
-		return -1;
+		return result;
+	}
+
+	int Interpreter::Term()
+	{
+		std::shared_ptr<Token<std::string>> token = current_token;
+		Eat(INTEGER_TYPE);
+		return std::stoi(token->GetTokenValue());
+	}
+
+	void Interpreter::HandleSharedPtrSafety()
+	{
+		if (!current_token)
+		{
+			current_token = std::make_shared<Token<std::string>>("OOET", OOET);
+		}
 	}
 
 	std::ostream& operator<< (std::ostream& out, const Interpreter& txt)

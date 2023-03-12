@@ -7,6 +7,8 @@ constexpr auto TOKEN_VALUE_POS = 0;
 #include <memory>
 #include <iostream>
 #include "Token.h"
+#include "TokenType.h"
+#include "OperatorTokenSymbol.h"
 
 namespace PascalInterpreter
 {
@@ -33,6 +35,7 @@ namespace PascalInterpreter
 		std::shared_ptr<Token<std::string>> GetNextToken();
 		void Eat(const std::string&);
 		int Expression();
+		
 
 		public:
 		Interpreter& operator= (const Interpreter& rhs)
@@ -43,6 +46,10 @@ namespace PascalInterpreter
 			current_token = rhs.current_token;
 			return *this;
 		}
+
+		private:
+		int Term();
+		void HandleSharedPtrSafety();
 
 		private:
 		std::string text;
