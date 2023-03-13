@@ -8,8 +8,9 @@ The interpreter currently performs simple arithmatic computation:
 * Division
 * Modulo
 
+Arbitrary expressions are now supported using the supported Math Operators listed above. 
+
 # UPCOMING FEATURE
-In the next feature the interpreter will be able to process arbitrary expressions containing all the supported arithmetic operations.
-e.g *5 + 2 - 1 x 11 ÷ 2*
+In the next feature we will be focusing on associativity and precedence of operators.
 
 #MORE WORK WILL BE ADDED WHEN I HAVE TIME.
