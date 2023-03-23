@@ -18,6 +18,11 @@ namespace PascalInterpreter
         {}
         Token<T>(T value) : token_value(value), token_type("")
         {}
+        Token<T>(std::shared_ptr<Token<std::string>> token_ptr)
+        {
+            token_value = token_ptr->GetTokenValue();
+            token_type = token_ptr->GetTokenType();
+        }
         Token<T>() = default;
 
         public:
@@ -33,7 +38,7 @@ namespace PascalInterpreter
         const std::string& GetTokenType() const { return token_type; }
 
         private:
-        T token_value = 0;
+        T token_value;
         std::string token_type = std::string("");
     };
 

@@ -140,14 +140,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Interpreter.h" />
+    <ClInclude Include="Lexer.h" />
     <ClInclude Include="OperatorTokenSymbol.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenType.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Interpreter.cpp" />
+    <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parser.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
