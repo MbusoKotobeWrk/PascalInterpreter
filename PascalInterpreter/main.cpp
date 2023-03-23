@@ -1,7 +1,8 @@
 #include "Token.h"
 #include "OperatorTokenSymbol.h"
 #include "TokenType.h"
-#include "Interpreter.h"
+#include "Lexer.h"
+#include "Parser.h"
 
 using namespace PascalInterpreter;
 
@@ -23,34 +24,40 @@ int main()
     if (token.GetTokenType().compare(INTEGER_TYPE))
         std::cout << "Oh yeah! this is an Integer type token" << std::endl;
 
-    Interpreter inputCode("2 + 2");
+    Lexer inputCode("2 + 2");
     std::cout << "Outputting the interpreter object." << std::endl;
     std::cout << inputCode << std::endl;
 
     std::cout << "Tesitng out the interpreter" << std::endl;
-    Interpreter interpreter = Interpreter("44 + 4");
-    auto result = interpreter.Expression();
-    std::cout << result << std::endl;
+    Lexer lexAdd = Lexer("44 + 4");
+    Parser parseAdd = Parser(lexAdd);
+    auto addResult = parseAdd.Expression();
+    std::cout << addResult << std::endl;
 
-    Interpreter interpreterSub = Interpreter("4 - 4");
-    auto subResult = interpreterSub.Expression();
+    Lexer lexSub = Lexer("4 - 4");
+    Parser parseSub = Parser(lexSub);
+    auto subResult = parseSub.Expression();
     std::cout << subResult << std::endl;
 
-    Interpreter interpreterTimes = Interpreter("4 * 4");
-    auto timesResult = interpreterTimes.Expression();
-    std::cout << timesResult << std::endl;
+    Lexer lexMult = Lexer("4 * 4");
+    Parser parseMult = Parser(lexMult);
+    auto multResult = parseMult.Expression();
+    std::cout << multResult << std::endl;
 
-    Interpreter interpreterDiv = Interpreter("4 / 4");
-    auto divResult = interpreterDiv.Expression();
+    Lexer lexDiv = Lexer("4 / 4");
+    Parser parseDiv = Parser(lexDiv);
+    auto divResult = parseDiv.Expression();
     std::cout << divResult << std::endl;
 
-    Interpreter interpreterMod = Interpreter("4 % 16");
-    auto modResult = interpreterMod.Expression();
+    Lexer lexMod = Lexer("4 % 16");
+    Parser parseMod = Parser(lexMod);
+    auto modResult = parseMod.Expression();
     std::cout << modResult << std::endl;
 
-    Interpreter interprete = Interpreter("4 + 4 - 2 * 4 / 2");
-    auto interpretersResults = interprete.Expression();
-    std::cout << interpretersResults << std::endl;
+    Lexer lexer = Lexer("4 + 4 - 2 * 4 / 2");
+    Parser parser = Parser(lexer);
+    auto parserResults = parser.Expression();
+    std::cout << parserResults << std::endl;
 
     std::cin >> line;
 }
